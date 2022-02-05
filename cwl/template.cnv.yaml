@@ -1,0 +1,28 @@
+common_biallelic:
+  class: File
+  path: a/file/path
+genome:
+  class: File
+  path: a/file/path
+genome_dict:
+  class: File
+  path: a/file/path
+normal_bam:
+  class: File
+  path: a/file/path
+out_dir:
+  class: Directory
+  path: a/file/path
+pool_of_normals:
+  class: File
+  path: a/file/path
+protein_coding_gene:
+  class: File
+  path: a/file/path
+sample: a_string
+target_interval_list:
+  class: File
+  path: a/file/path
+tumor_bam:
+  class: File
+  path: a/file/path
