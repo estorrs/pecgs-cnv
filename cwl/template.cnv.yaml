@@ -10,9 +10,6 @@ genome_dict:
 normal_bam:
   class: File
   path: a/file/path
-out_dir:
-  class: Directory
-  path: a/file/path
 pool_of_normals:
   class: File
   path: a/file/path

@@ -7,6 +7,9 @@ arguments:
 - position: 0
   prefix: --merge-gene-script
   valueFrom: /pecgs-cnv/cnv/mergeMultipleFilesToOne.py
+- position: 0
+  prefix: --out-dir
+  valueFrom: outputs
 baseCommand:
 - python
 - /pecgs-cnv/cnv/cnv.py
