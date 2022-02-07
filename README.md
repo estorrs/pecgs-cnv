@@ -1,4 +1,4 @@
-# pecgs-fusion
+# pecgs-cnv
 cwl wrapper for dinglab somatic cnv pipeline based on GATK4 workflow
 
 based on [dinglab cnv pipeline](https://github.com/ding-lab/GATK4SCNA)
