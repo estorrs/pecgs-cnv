@@ -3,6 +3,17 @@ cwl wrapper for dinglab somatic cnv pipeline based on GATK4 workflow
 
 based on [dinglab cnv pipeline](https://github.com/ding-lab/GATK4SCNA)
 
+#### Step 1 (optional): Creating pool of normals (PON) on compute1.
+Only do this step if you need a new pool of normals. One has already been created from 86 CPTAC bams here /storage1/fs1/dinglab/Active/Projects/estorrs/pecgs-resources/cnv_resources/pon/create_pon/gatk4scnaPON.Normal.hdf5
+
+[notebook](https://github.com/estorrs/pecgs-cnv/blob/master/notebooks/create_pon_and_test_run_on_compute1.ipynb) for creating pon commands on compute1
+
+#### Step 2: Get somatic CNV for sample.
+
+[notebook](https://github.com/estorrs/pecgs-cnv/blob/master/notebooks/generate_test_run.ipynb) for generating test CNV commands
+[notebook](https://github.com/estorrs/wombat/blob/master/notebooks/test_cnv.ipynb) for generating commands to run cwl on compute1
+[directory](https://github.com/estorrs/wombat/tree/master/tests/data/cnv) containing commands to run cnv for a sample on compute1
+
 #### Running cnv.py
 
 ###### Arguments
