@@ -11,7 +11,9 @@ Only do this step if you need a new pool of normals. One has already been create
 #### Step 2: Get somatic CNV for sample.
 
 [notebook](https://github.com/estorrs/pecgs-cnv/blob/master/notebooks/generate_test_run.ipynb) for generating test CNV commands
+
 [notebook](https://github.com/estorrs/wombat/blob/master/notebooks/test_cnv.ipynb) for generating commands to run cwl on compute1
+
 [directory](https://github.com/estorrs/wombat/tree/master/tests/data/cnv) containing commands to run cnv for a sample on compute1
 
 #### Running cnv.py
