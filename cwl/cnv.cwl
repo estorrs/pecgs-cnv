@@ -68,7 +68,11 @@ inputs:
   id: environ_PATH
   type: string?
 label: cnv
-outputs: []
+outputs:
+- id: gene_level_cnv
+  outputBinding:
+    glob: outputs/*T.geneLevel.from_seg.cn
+  type: File
 requirements:
 - class: DockerRequirement
   dockerPull: estorrs/pecgs_fusion:0.0.2

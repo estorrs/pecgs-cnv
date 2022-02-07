@@ -48,24 +48,24 @@ parser.add_argument('--pool-of-normals', type=str,
 args = parser.parse_args()
 
 
-def collect_read_counts(tumor_bam, sample, out_dir):
+def collect_read_counts(bam, sample, out_dir, char):
     pieces = [
         'gatk CollectReadCounts',
-        '-I', tumor_bam,
+        '-I', bam,
         '-L', args.target_interval_list,
         '--interval-merging-rule OVERLAPPING_ONLY',
-        '-O', os.path.join(out_dir, f'{sample}.T.counts.hdf5')
+        '-O', os.path.join(out_dir, f'{sample}.{char}.counts.hdf5')
     ]
     return ' '.join(pieces)
 
 
-def denoise_counts(sample, out_dir):
+def denoise_counts(sample, out_dir, char):
     pieces = [
         'gatk DenoiseReadCounts',
-        '-I', os.path.join(out_dir, f'{sample}.T.counts.hdf5'),
+        '-I', os.path.join(out_dir, f'{sample}.{char}.counts.hdf5'),
         '--count-panel-of-normals', args.pool_of_normals,
-        '--standardized-copy-ratios', os.path.join(out_dir, f'{sample}.T.standardizedCR.tsv'),
-        '--denoised-copy-ratios', os.path.join(out_dir, f'{sample}.T.denoisedCR.tsv')
+        '--standardized-copy-ratios', os.path.join(out_dir, f'{sample}.{char}.standardizedCR.tsv'),
+        '--denoised-copy-ratios', os.path.join(out_dir, f'{sample}.{char}.denoisedCR.tsv')
     ]
     return ' '.join(pieces)
 
@@ -81,23 +81,23 @@ def collect_allelic_counts(bam, sample, out_dir, char):
     return ' '.join(pieces)
 
 
-def model_segments(sample, out_dir):
+def model_segments(sample, out_dir, char):
     pieces = [
         'gatk ModelSegments',
-        '--denoised-copy-ratios', os.path.join(out_dir, f'{sample}.T.denoisedCR.tsv'),
-        '--allelic-counts', os.path.join(out_dir, f'{sample}.T.allelicCounts.tsv'),
+        '--denoised-copy-ratios', os.path.join(out_dir, f'{sample}.{char}.denoisedCR.tsv'),
+        '--allelic-counts', os.path.join(out_dir, f'{sample}.{char}.allelicCounts.tsv'),
         '--normal-allelic-counts', os.path.join(out_dir, f'{sample}.N.allelicCounts.tsv'),
         '--output', out_dir,
-        '--output-prefix', f'{sample}.T'
+        '--output-prefix', f'{sample}.{char}'
     ]
     return ' '.join(pieces)
 
 
-def call_copy_segments(sample, out_dir):
+def call_copy_segments(sample, out_dir, char):
     pieces = [
         'gatk CallCopyRatioSegments',
-        '--input', os.path.join(out_dir, f'{sample}.T.cr.seg'),
-        '--output', os.path.join(out_dir, f'{sample}.T.called.seg')
+        '--input', os.path.join(out_dir, f'{sample}.{char}.cr.seg'),
+        '--output', os.path.join(out_dir, f'{sample}.{char}.called.seg')
     ]
     return ' '.join(pieces)
 
@@ -152,13 +152,23 @@ def merge_gene_level(script, out_dir):
 
 def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
             merge_gene_script):
-    logging.info('collecting tumor reads')
-    cmd = collect_read_counts(tumor_bam, sample, out_dir)
+    logging.info('collecting reads tumor')
+    cmd = collect_read_counts(tumor_bam, sample, out_dir, 'T')
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
-    logging.info('denoising counts')
-    cmd = denoise_counts(sample, out_dir)
+    logging.info('collecting reads normal')
+    cmd = collect_read_counts(normal_bam, sample, out_dir, 'N')
+    logging.info(f'executing command: {cmd}')
+    subprocess.check_output(cmd, shell=True)
+
+    logging.info('denoising counts tumor')
+    cmd = denoise_counts(sample, out_dir, 'T')
+    logging.info(f'executing command: {cmd}')
+    subprocess.check_output(cmd, shell=True)
+
+    logging.info('denoising counts normal')
+    cmd = denoise_counts(sample, out_dir, 'N')
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
@@ -172,13 +182,23 @@ def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
-    logging.info('modeling segments')
-    cmd = model_segments(sample, out_dir)
+    logging.info('modeling segments tumor')
+    cmd = model_segments(sample, out_dir, 'T')
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
-    logging.info('call copy ratio segments')
-    cmd = call_copy_segments(sample, out_dir)
+    logging.info('modeling segments normal')
+    cmd = model_segments(sample, out_dir, 'N')
+    logging.info(f'executing command: {cmd}')
+    subprocess.check_output(cmd, shell=True)
+
+    logging.info('call copy ratio segments tumor')
+    cmd = call_copy_segments(sample, out_dir, 'T')
+    logging.info(f'executing command: {cmd}')
+    subprocess.check_output(cmd, shell=True)
+
+    logging.info('call copy ratio segments normal')
+    cmd = call_copy_segments(sample, out_dir, 'N')
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
@@ -207,10 +227,11 @@ def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
-    logging.info('merging gene level')
-    cmd = merge_gene_level(merge_gene_script, out_dir)
-    logging.info(f'executing command: {cmd}')
-    subprocess.check_output(cmd, shell=True)
+# dont need this step because only running one sample at a time
+#     logging.info('merging gene level')
+#     cmd = merge_gene_level(merge_gene_script, out_dir)
+#     logging.info(f'executing command: {cmd}')
+#     subprocess.check_output(cmd, shell=True)
 
 
 def main():
