@@ -29,11 +29,6 @@ inputs:
   inputBinding:
     position: '3'
   type: File
-- id: out_dir
-  inputBinding:
-    position: '0'
-    prefix: --out-dir
-  type: Directory
 - id: genome
   inputBinding:
     position: '0'
@@ -63,7 +58,7 @@ inputs:
   inputBinding:
     position: '0'
     prefix: --pool-of-normals
-  type: Directory
+  type: File
 - default: /miniconda/envs/cnv/bin:$PATH
   id: environ_PATH
   type: string?
