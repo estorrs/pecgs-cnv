@@ -9,7 +9,7 @@ inputs:
 - id: normal_bam
   type: File
 - id: reference_dir
-  type: File
+  type: Directory
 - id: target_interval_list
   type: File
 - id: common_biallelic
