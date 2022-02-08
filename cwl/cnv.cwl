@@ -2,6 +2,12 @@ $namespaces:
   sbg: https://www.sevenbridges.com/
 arguments:
 - position: 0
+  prefix: --genome
+  valueFrom: $(inputs.reference_dir)/GRCh38.d1.vd1.fa
+- position: 0
+  prefix: --genome-dict
+  valueFrom: $(inputs.reference_dir)/GRCh38.d1.vd1.dict
+- position: 0
   prefix: --gene-level-script
   valueFrom: /pecgs-cnv/cnv/segment_to_geneLevel.py
 - position: 0
@@ -29,16 +35,8 @@ inputs:
   inputBinding:
     position: '3'
   type: File
-- id: genome
-  inputBinding:
-    position: '0'
-    prefix: --genome
-  type: File
-- id: genome_dict
-  inputBinding:
-    position: '0'
-    prefix: --genome-dict
-  type: File
+- id: reference_dir
+  type: Directory
 - id: target_interval_list
   inputBinding:
     position: '0'
