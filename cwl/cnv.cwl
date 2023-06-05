@@ -9,10 +9,10 @@ arguments:
   valueFrom: $(inputs.reference_dir)/GRCh38.d1.vd1.dict
 - position: 0
   prefix: --gene-level-script
-  valueFrom: /pecgs-cnv/cnv/segment_to_geneLevel.py
+  valueFrom: /pecgs-cnv/cnv/segment_to_geneLevel_v4.py
 - position: 0
-  prefix: --merge-gene-script
-  valueFrom: /pecgs-cnv/cnv/mergeMultipleFilesToOne.py
+  prefix: --arm-level-script
+  valueFrom: /pecgs-cnv/cnv/segment_to_chr_arm_level_v4.py
 - position: 0
   prefix: --out-dir
   valueFrom: outputs
@@ -52,6 +52,11 @@ inputs:
     position: '0'
     prefix: --protein-coding-gene
   type: File
+- id: cytoband
+  inputBinding:
+    position: '0'
+    prefix: --cytoband
+  type: File
 - id: pool_of_normals
   inputBinding:
     position: '0'
@@ -66,11 +71,15 @@ outputs:
   outputBinding:
     glob: outputs/*T.geneLevel.from_seg.cn
   type: File
+- id: arm_level_cnv
+  outputBinding:
+    glob: outputs/*T.bandLevel.from_seg.cn
+  type: File
 requirements:
 - class: DockerRequirement
-  dockerPull: estorrs/pecgs_cnv:0.0.1
+  dockerPull: estorrs/pecgs_cnv:0.0.2
 - class: ResourceRequirement
-  ramMin: 50000
+  ramMin: 60000
 - class: EnvVarRequirement
   envDef:
     PATH: $(inputs.environ_PATH)

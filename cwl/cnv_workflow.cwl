@@ -8,13 +8,17 @@ inputs:
   type: File
 - id: normal_bam
   type: File
-- id: reference_dir
-  type: Directory
+- id: genome
+  type: File
+- id: genome_dict
+  type: File
 - id: target_interval_list
   type: File
 - id: common_biallelic
   type: File
 - id: protein_coding_gene
+  type: File
+- id: cytoband
   type: File
 - id: pool_of_normals
   type: File
@@ -23,19 +27,26 @@ outputs:
 - id: gene_level_cnv
   outputSource: cnv/gene_level_cnv
   type: File
+- id: arm_level_cnv
+  outputSource: cnv/arm_level_cnv
+  type: File
 requirements:
 - class: ScatterFeatureRequirement
 steps:
 - id: cnv
   in:
-  - id: reference_dir
-    source: reference_dir
+  - id: genome
+    source: genome
+  - id: genome_dict
+    source: genome_dict
   - id: target_interval_list
     source: target_interval_list
   - id: common_biallelic
     source: common_biallelic
   - id: protein_coding_gene
     source: protein_coding_gene
+  - id: cytoband
+    source: cytoband
   - id: pool_of_normals
     source: pool_of_normals
   - id: sample
@@ -47,6 +58,7 @@ steps:
   label: cnv
   out:
   - id: gene_level_cnv
+  - id: arm_level_cnv
   run: ./cnv.cwl
 - id: stage_normal_bam
   in:

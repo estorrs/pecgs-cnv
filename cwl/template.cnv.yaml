@@ -1,6 +1,9 @@
 common_biallelic:
   class: File
   path: a/file/path
+cytoband:
+  class: File
+  path: a/file/path
 normal_bam:
   class: File
   path: a/file/path
