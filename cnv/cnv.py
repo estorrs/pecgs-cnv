@@ -20,11 +20,18 @@ parser.add_argument('normal_bam', type=str,
 parser.add_argument('--out-dir', type=str, default='output',
     help='output directory')
 
-parser.add_argument('--gene-level-script', type=str,
-    help='location of gene level python script from https://github.com/ding-lab/GATK4SCNA/tree/main/src')
+parser.add_argument('--gene-level-script', type=str, default='/pecgs-cnv/cnv/segment_to_geneLevel_v4.py',
+    help='location of gene level python script')
 
-parser.add_argument('--merge-gene-script', type=str,
-    help='location of merge gene level python script from https://github.com/ding-lab/GATK4SCNA/tree/main/src')
+parser.add_argument('--arm-level-script', type=str, default='/pecgs-cnv/cnv/segment_to_chr_arm_level_v4.py',
+    help='location of arm level python script')
+
+## don't need these because only running one sample at a time
+# parser.add_argument('--merge-gene-script', type=str, default='/pecgs-cnv/cnv/mergeMultipleFilesToOne_v2.py',
+#     help='location of merge gene level python script from https://github.com/ding-lab/GATK4SCNA/tree/main/src')
+
+# parser.add_argument('--merge-arm-script', type=str, default='/pecgs-cnv/cnv/mergeMultiple_chr_arm_FilesToOne.py',
+#     help='location of merge gene level python script from https://github.com/ding-lab/GATK4SCNA/tree/main/src')
 
 parser.add_argument('--genome', type=str,
     help='reference location')
@@ -41,12 +48,14 @@ parser.add_argument('--common-biallelic', type=str,
 parser.add_argument('--protein-coding-gene', type=str,
     help='location of gencode.v34.annotation.gene_filterd.need_gene_symbol.no_sym.filtered_to_hgnc_protein-coding_genes.bed')
 
+parser.add_argument('--cytoband', type=str,
+    help='location of cytoBand.txt file for arm levels calls')
+
 parser.add_argument('--pool-of-normals', type=str,
         help='location of pool of normals created in step 1 and 2 of https://github.com/ding-lab/GATK4SCNA/tree/main/src')
 
 
 args = parser.parse_args()
-
 
 def collect_read_counts(bam, sample, out_dir, char):
     pieces = [
@@ -142,16 +151,27 @@ def gene_level(script, sample, out_dir):
     ]
     return ' '.join(pieces)
 
-
-def merge_gene_level(script, out_dir):
+def arm_level(script, sample, out_dir):
     pieces = [
-        'python', script, out_dir
+        'python', script,
+        '--prefix', f'{sample}.T',
+        '--name', sample,
+        '--seg', os.path.join(out_dir, f'{sample}.T.called.igv.seg'),
+        '--band', args.cytoband,
+        '-o', out_dir
     ]
     return ' '.join(pieces)
 
 
+# def merge_gene_level(script, out_dir):
+#     pieces = [
+#         'python', script, out_dir
+#     ]
+#     return ' '.join(pieces)
+
+
 def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
-            merge_gene_script):
+            arm_level_script):
     logging.info('collecting reads tumor')
     cmd = collect_read_counts(tumor_bam, sample, out_dir, 'T')
     logging.info(f'executing command: {cmd}')
@@ -227,6 +247,11 @@ def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
+    logging.info('running arm level')
+    cmd = gene_level(arm_level_script, sample, out_dir)
+    logging.info(f'executing command: {cmd}')
+    subprocess.check_output(cmd, shell=True)
+
 # dont need this step because only running one sample at a time
 #     logging.info('merging gene level')
 #     cmd = merge_gene_level(merge_gene_script, out_dir)
@@ -235,9 +260,14 @@ def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
 
 
 def main():
+    assert os.path.exists(args.gene_level_script)
+    assert os.path.exists(args.arm_level_script)
+    assert os.path.exists(args.merge_gene_script)
+    assert os.path.exists(args.merge_arm_script)
+
     Path(args.out_dir).mkdir(parents=True, exist_ok=True)
     run_cnv(args.normal_bam, args.tumor_bam, args.sample, args.out_dir,
-            args.gene_level_script, args.merge_gene_script)
+            args.gene_level_script, args.arm_level_script)
 
 
 if __name__ == '__main__':
