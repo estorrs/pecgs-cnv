@@ -248,7 +248,7 @@ def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
     subprocess.check_output(cmd, shell=True)
 
     logging.info('running arm level')
-    cmd = gene_level(arm_level_script, sample, out_dir)
+    cmd = arm_level(arm_level_script, sample, out_dir)
     logging.info(f'executing command: {cmd}')
     subprocess.check_output(cmd, shell=True)
 
@@ -262,8 +262,6 @@ def run_cnv(normal_bam, tumor_bam, sample, out_dir, gene_level_script,
 def main():
     assert os.path.exists(args.gene_level_script)
     assert os.path.exists(args.arm_level_script)
-    assert os.path.exists(args.merge_gene_script)
-    assert os.path.exists(args.merge_arm_script)
 
     Path(args.out_dir).mkdir(parents=True, exist_ok=True)
     run_cnv(args.normal_bam, args.tumor_bam, args.sample, args.out_dir,
