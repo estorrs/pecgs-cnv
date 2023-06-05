@@ -8,10 +8,8 @@ inputs:
   type: File
 - id: normal_bam
   type: File
-- id: genome
-  type: File
-- id: genome_dict
-  type: File
+- id: reference_dir
+  type: Directory
 - id: target_interval_list
   type: File
 - id: common_biallelic
@@ -35,10 +33,8 @@ requirements:
 steps:
 - id: cnv
   in:
-  - id: genome
-    source: genome
-  - id: genome_dict
-    source: genome_dict
+  - id: reference_dir
+    source: reference_dir
   - id: target_interval_list
     source: target_interval_list
   - id: common_biallelic
