@@ -50,6 +50,9 @@ parser.add_argument('--gene', required=True, help='gene bed file')
 parser.add_argument('--prefix', default='', help='prefix for output name')
 parser.add_argument('-o', '--outdir', required=True, help='outdir')
 
+# added in addition to austins pipeline so it works with cromwell
+parser.add_argument('--step3-stderr-filepath', default='./stderr', help='Where stderr stored from step 3 is located. Default is ./stderr which is where it will be during a cromwell execution.')
+
 args = parser.parse_args()
 
 
@@ -59,7 +62,7 @@ def main():
     Check_File(args.gene)
     Check_Dir(args.outdir)
 
-    SegCN_to_GeneLevel(args.name, args.seg, args.gene, args.prefix, args.outdir)
+    SegCN_to_GeneLevel(args.name, args.seg, args.gene, args.prefix, args.outdir, args.step3_stderr_filepath)
 
 
 '''
@@ -78,7 +81,7 @@ def Check_Dir(dir):
 
 
 '''Make gene-level cn'''
-def SegCN_to_GeneLevel(sampleName, f_seg, f_gene, prefix, outdir):
+def SegCN_to_GeneLevel(sampleName, f_seg, f_gene, prefix, outdir, step3_stderr_filepath):
     df_seg = pd.read_csv(f_seg, sep='\t', low_memory=False)
     #print(df_seg)
     df_seg = df_seg[['Chromosome','Start','End','Segment_Mean','Call','Sample']] #this line converts the dataframe to bed format so it can be written
@@ -103,7 +106,7 @@ def SegCN_to_GeneLevel(sampleName, f_seg, f_gene, prefix, outdir):
     file.close()
 
     #here you are going to essentially replicate the logic from the SimpleCopyRatioCaller.java script that is used by the CallCopyRatioSegments.java script that is run when your run the GATK4SCNA pipeline as you will need some of the values that it generates below. Good luck:
-    cmd2 = f'grep "Length-weighted" {outdir}/../logs/gatk4cn.s3.{sampleName}.err > {outdir}/copy-number-calling-criteria-from-step3-log-file.txt'
+    cmd2 = f'grep "Length-weighted" {step3_stderr_filepath} > {outdir}/copy-number-calling-criteria-from-step3-log-file.txt'
     os.system(cmd2)
 
     cr_calling_path = f'{outdir}/copy-number-calling-criteria-from-step3-log-file.txt'
